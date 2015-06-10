@@ -10,7 +10,7 @@ package com.pfafman.bleObserver;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-
+import android.os.ParcelUuid;
 
 // Cordova
 import org.apache.cordova.CallbackContext;
@@ -38,6 +38,7 @@ import android.bluetooth.le.ScanResult;
 // Java Utils
 //import java.util.*;
 import java.util.UUID;
+import java.util.List;
 
 
 @TargetApi(21)
@@ -46,7 +47,7 @@ public class BleObserver extends CordovaPlugin
 {
   //General callback variables  
   private CallbackContext mScanCallbackContext;
-  private final BluetoothAdapter mBluetoothAdapter;
+  private BluetoothAdapter mBluetoothAdapter;
 
   // @Override
   // public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -85,67 +86,71 @@ public class BleObserver extends CordovaPlugin
   }
 
 
-  private void startScanAction(final JSONArray args, final CallbackContext callbackContext)
+  private void startScan(final JSONArray args, final CallbackContext callbackContext)
   {
-    if (scanCallbackContext != null) 
+    if (mScanCallbackContext != null) 
     {
       callbackContext.error("scanning");
       return;
     }
-    scanCallbackContext = callbackContext;
+    mScanCallbackContext = callbackContext;
 
     // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
+    // cordova.getThreadPool().execute(new Runnable() {
+    //   public void run() {
 
-        // BLE Adapter
-        BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+    // BLE Adapter
+    BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
-        UUID[] serviceUUIDs = parseServiceUUIDList(args.getJSONArray(0));
+    UUID[] serviceUUIDs = parseServiceUUIDList(args.getJSONArray(0));
 
-        List<ScanFilter> filters = new ArrayList<ScanFilter>();
-        
-        if (serviceUuids == null || serviceUuids.length == 0) {
-          for (UUID serviceUuid : serviceUuids) {
-            ScanFilter uuidFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUuid)).build();
-            filters.add(uuidFilter);
-          }
-        }
+    List<ScanFilter> filters = new ArrayList<ScanFilter>();
+    
+    if (serviceUUIDs == null || serviceUUIDs.length == 0) {
+      for (UUID serviceUUID : serviceUUIDs) {
+        ScanFilter uuidFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUUID)).build();
+        filters.add(uuidFilter);
+      }
+    }
 
-        ScanSettings settings = new ScanSettings.Builder()
-          .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-          //.setReportDelay(0)
-          .build();
+    ScanSettings settings = new ScanSettings.Builder()
+      .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+      //.setReportDelay(0)
+      .build();
 
-        scanner.startScan(filters, settings, scanCallback);
+    scanner.startScan(filters, settings, scanCallback);
 
-        callbackContext.success("scanning started");
-      }  
-    });
+    callbackContext.success("scanning started");
+
+    //   }  
+    // });
+
   }
 
 
-  private void stopScanAction(final CallbackContext callbackContext)
+  private void stopScan(final CallbackContext callbackContext)
   {
-    if (scanCallbackContext == null) 
+    if (mScanCallbackContext == null) 
     {
       callbackContext.error("not scanning");
       return;
     }
-    scanCallbackContext = null;
+    mScanCallbackContext = null;
 
     // Run in a thread.  I think the need for this goes away with Cordova 4+ !!!
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
-        // BLE Adapter
-        BluetoothLeScanner scanner = bluetoothAdapter.getBluetoothLeScanner();
+    // cordova.getThreadPool().execute(new Runnable() {
+    //   public void run() {
+        
+    // BLE Adapter
+    BluetoothLeScanner scanner = bluetoothAdapter.getBluetoothLeScanner();
 
-        // Stop scan
-        scanner.stopScan(scanCallback);
-    
-        callbackContext.success("scanning stopped");
-      }
-    });
+    // Stop scan
+    scanner.stopScan(scanCallback);
+
+    callbackContext.success("scanning stopped");
+
+    //   }
+    // });
     
   }
 
@@ -157,7 +162,7 @@ public class BleObserver extends CordovaPlugin
       
       //Log.i("onScanResult", result.toString());
 
-      if (scanCallbackContext == null)
+      if (mScanCallbackContext == null)
       {
         return;
       }
@@ -169,13 +174,13 @@ public class BleObserver extends CordovaPlugin
       addProperty(returnObj, keyStatus, statusScanResult);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
       pluginResult.setKeepCallback(true);
-      scanCallbackContext.sendPluginResult(pluginResult);
+      mScanCallbackContext.sendPluginResult(pluginResult);
 
     }
 
     @Override
     public void onBatchScanResults(final List<ScanResult> results) {
-      if (scanCallbackContext == null)
+      if (mScanCallbackContext == null)
       {
         return;
       }
@@ -190,7 +195,7 @@ public class BleObserver extends CordovaPlugin
         addProperty(returnObj, keyStatus, statusScanResult);
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
         pluginResult.setKeepCallback(true);
-        scanCallbackContext.sendPluginResult(pluginResult);
+        mScanCallbackContext.sendPluginResult(pluginResult);
             
       }
 
@@ -199,7 +204,7 @@ public class BleObserver extends CordovaPlugin
     @Override
     public void onScanFailed(final int errorCode) {
       //Log.e("Scan Failed", "Error Code: " + errorCode);
-      if (scanCallbackContext == null)
+      if (mScanCallbackContext == null)
       {
         return;
       }
@@ -207,8 +212,8 @@ public class BleObserver extends CordovaPlugin
       JSONObject returnObj = new JSONObject();
       addProperty(returnObj, keyError, errorStartScan);
       addProperty(returnObj, keyMessage, logScanStartFail);
-      scanCallbackContext.error(returnObj);
-      scanCallbackContext = null;
+      mScanCallbackContext.error(returnObj);
+      mScanCallbackContext = null;
 
     }
   };
