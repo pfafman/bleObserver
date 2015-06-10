@@ -51,6 +51,9 @@ public class BleObserver extends CordovaPlugin
   private CallbackContext mScanCallbackContext;
   private BluetoothAdapter mBluetoothAdapter;
 
+  private final String mBaseUuidStart = "0000";
+  private final String mBaseUuidEnd = "-0000-1000-8000-00805f9b34fb";
+
   // @Override
   // public void initialize(CordovaInterface cordova, CordovaWebView webView) {
   //   super.initialize(cordova, webView);
@@ -104,7 +107,7 @@ public class BleObserver extends CordovaPlugin
     // BLE Adapter
     BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
-    UUID[] serviceUUIDs = parseServiceUUIDList(args.getJSONArray(0));
+    UUID[] serviceUUIDs = getServiceUuids(args);
 
     List<ScanFilter> filters = new ArrayList<ScanFilter>();
     
@@ -268,15 +271,57 @@ public class BleObserver extends CordovaPlugin
   }
 
 
-  private UUID[] parseServiceUUIDList(JSONArray jsonArray) throws JSONException {
-    List<UUID> serviceUUIDs = new ArrayList<UUID>();
+  private UUID[] getServiceUuids(JSONObject obj)
+  {
+    JSONArray array = obj.optJSONArray("serviceUUIDs");
 
-    for(int i = 0; i < jsonArray.length(); i++){
-      String uuidString = jsonArray.getString(i);
-      serviceUUIDs.add(uuidFromString(uuidString));
+    if (array == null)
+    {
+      return null;
     }
 
-    return serviceUUIDs.toArray(new UUID[jsonArray.length()]);
+    //Create temporary array list for building array of UUIDs
+    ArrayList<UUID> arrayList = new ArrayList<UUID>();
+
+    //Iterate through the UUID strings
+    for (int i = 0; i < array.length(); i++)
+    {
+      String value = array.optString(i, null);
+
+      if (value == null)
+      {
+        continue;
+      }
+
+      if (value.length() == 4)
+      {
+        value = mBaseUuidStart + value + mBaseUuidEnd;
+      }
+
+
+      //Try converting string to UUID and add to list
+      try
+      {
+        UUID uuid = UUID.fromString(value);
+        arrayList.add(uuid);
+      }
+      catch (Exception ex)
+      {
+      }
+    }
+
+    //If anything was actually added, convert list to array
+    int size = arrayList.size();
+
+    if (size == 0)
+    {
+      return null;
+    }
+
+    UUID[] uuids = new UUID[size];
+    uuids = arrayList.toArray(uuids);
+    return uuids;
   }
+
 
 }
