@@ -50,7 +50,7 @@ import org.apache.cordova.LOG;
 
 @TargetApi(21)
 
-public class BleObserver extends CordovaPlugin
+public class BleObserverPlugin extends CordovaPlugin
 {
   //General callback variables  
   private CallbackContext mScanCallbackContext;
