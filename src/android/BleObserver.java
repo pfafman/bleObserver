@@ -17,7 +17,6 @@ import android.util.Base64;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
-import org.apache.cordova.LOG;
 
 
 // JSON
@@ -42,6 +41,11 @@ import android.bluetooth.le.ScanResult;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
+
+
+// Debugging 
+//import android.util.Log;
+import org.apache.cordova.LOG;
 
 
 @TargetApi(21)
@@ -169,7 +173,7 @@ public class BleObserver extends CordovaPlugin
     @Override
     public void onScanResult(final int callbackType, final ScanResult result) {
       
-      //Log.i("onScanResult", result.toString());
+      LOG.i("onScanResult", result.toString());
 
       if (mScanCallbackContext == null)
       {
@@ -195,7 +199,7 @@ public class BleObserver extends CordovaPlugin
       }
       
       for (ScanResult result : results) {
-        //Log.i("ScanResult - Results", result.toString());
+        LOG.i("ScanResult - Results", result.toString());
         
         JSONObject returnObj = new JSONObject();
         addDevice(returnObj, result.getDevice());
@@ -212,7 +216,7 @@ public class BleObserver extends CordovaPlugin
 
     @Override
     public void onScanFailed(final int errorCode) {
-      Log.e("Scan Failed", "Error Code: " + errorCode);
+      LOG.e("Scan Failed", "Error Code: " + errorCode);
       if (mScanCallbackContext == null)
       {
         return;
