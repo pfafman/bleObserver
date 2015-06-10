@@ -90,7 +90,7 @@ public class BluetoothLePlugin extends CordovaPlugin
       callbackContext.error("scanning");
       return;
     }
-    scanCallbackContext = callbackContext
+    scanCallbackContext = callbackContext;
 
     // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
     cordova.getThreadPool().execute(new Runnable() {
