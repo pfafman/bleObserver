@@ -71,6 +71,8 @@ public class BleObserverPlugin extends CordovaPlugin
   public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException
   {
 
+    LOG.i("BleObserverPlugin:execute", action);
+
     if (mBluetoothAdapter == null) {
       Activity activity = cordova.getActivity();
       BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -98,6 +100,7 @@ public class BleObserverPlugin extends CordovaPlugin
 
   private void startScan(final JSONArray args, final CallbackContext callbackContext)
   {
+    LOG.i("BleObserverPlugin:startScan", "call");
     if (mScanCallbackContext != null) 
     {
       callbackContext.error("scanning");
@@ -131,6 +134,7 @@ public class BleObserverPlugin extends CordovaPlugin
       //.setReportDelay(0)
       .build();
 
+    LOG.i("BleObserverPlugin:startScan", "startScan");
     scanner.startScan(filters, settings, scanCallback);
 
     callbackContext.success("scanning started");
@@ -143,6 +147,7 @@ public class BleObserverPlugin extends CordovaPlugin
 
   private void stopScan(final CallbackContext callbackContext)
   {
+    LOG.i("BleObserverPlugin:stopScan", "called");
     if (mScanCallbackContext == null) 
     {
       callbackContext.error("not scanning");
@@ -158,6 +163,7 @@ public class BleObserverPlugin extends CordovaPlugin
     BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
     // Stop scan
+    LOG.i("BleObserverPlugin:stopScan", "stopScan");
     scanner.stopScan(scanCallback);
 
     callbackContext.success("scanning stopped");
