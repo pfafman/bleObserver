@@ -5,7 +5,6 @@
 
 package com.pfafman.bleObserver;
 
-
 // Android Base
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -37,7 +36,6 @@ import android.bluetooth.le.ScanResult;
 
 
 // Java Utils
-//import java.util.*;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
@@ -88,6 +86,11 @@ public class BleObserverPlugin extends CordovaPlugin
     
       stopScan(callbackContext); 
       return true; 
+
+     } else if ("flush".equals(action)) { 
+    
+      flushPendingScanResults(callbackContext); 
+      return true; 
     
     } else {
 
@@ -98,6 +101,7 @@ public class BleObserverPlugin extends CordovaPlugin
   }
 
 
+  // Start Scanner
   private void startScan(final JSONArray args, final CallbackContext callbackContext)
   {
     LOG.i("BleObserverPlugin:startScan", "call");
@@ -149,6 +153,7 @@ public class BleObserverPlugin extends CordovaPlugin
   }
 
 
+  // Stop Scanner
   private void stopScan(final CallbackContext callbackContext)
   {
     LOG.i("BleObserverPlugin:stopScan", "called");
@@ -175,6 +180,29 @@ public class BleObserverPlugin extends CordovaPlugin
     //   }
     // });
     
+  }
+
+
+  // flush scanner
+  private void flushPendingScanResults(final CallbackContext callbackContext)
+  {
+    LOG.i("BleObserverPlugin:flushPendingScanResults", "called");
+    if (mScanCallbackContext == null) {
+      callbackContext.error("not scanning");
+      return;
+    }
+
+    // BLE Adapter
+    BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+    // Stop scan
+    LOG.i("BleObserverPlugin:flushPendingScanResults", "flushPendingScanResults");
+    scanner.flushPendingScanResults(scanCallback);    
+
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "flushing");
+    //pluginResult.setKeepCallback(true);
+    callbackContext.sendPluginResult(pluginResult);
+
   }
 
 

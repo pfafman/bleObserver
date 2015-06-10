@@ -9,6 +9,9 @@ var bleObserver = {
   stop: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, bleObserverName, "stop", []);
   },
+  flush: function(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, bleObserverName, "flush", []);
+  },
   encodedStringToBytes: function(string) {
     var data = atob(string);
     var bytes = new Uint8Array(data.length);
