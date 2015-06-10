@@ -116,12 +116,10 @@ public class BleObserverPlugin extends CordovaPlugin
     BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
     //Get the service UUIDs from the arguments
+    UUID[] serviceUUIDs = null;
     JSONObject obj = getArgsObject(args);
-
-    UUID[] serviceUuids = null;
-
     if (obj != null) {
-      serviceUuids = getServiceUuids(obj);
+      serviceUUIDs = getServiceUuids(obj);
     }
     
     List<ScanFilter> filters = new ArrayList<ScanFilter>();
@@ -156,7 +154,7 @@ public class BleObserverPlugin extends CordovaPlugin
       callbackContext.error("not scanning");
       return;
     }
-    
+
     mScanCallbackContext = null;
 
     // Run in a thread.  I think the need for this goes away with Cordova 4+ !!!
