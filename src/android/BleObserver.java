@@ -40,7 +40,7 @@ import java.util.UUID;
 
 @TargetApi(21)
 
-public class BluetoothLePlugin extends CordovaPlugin
+public class BleObserver extends CordovaPlugin
 {
   //General callback variables  
   private CallbackContext mScanCallbackContext;
