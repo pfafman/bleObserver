@@ -1,5 +1,5 @@
 
-var bleObserverName = "BleObserver";
+var bleObserverName = "BleObserverPlugin";
                        
 
 var bleObserver = {
