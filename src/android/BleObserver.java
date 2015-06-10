@@ -1,8 +1,6 @@
 /*
  *  Ble Observer Plugin for Android SDK >= 21
  *
- *
- *
  */
 
 package com.pfafman.bleObserver;
@@ -94,7 +92,7 @@ public class BluetoothLePlugin extends CordovaPlugin
     }
     scanCallbackContext = callbackContext
 
-    // Run in a thread.
+    // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
 
@@ -134,7 +132,7 @@ public class BluetoothLePlugin extends CordovaPlugin
     }
     scanCallbackContext = null;
 
-    // Run in a thread.
+    // Run in a thread.  I think the need for this goes away with Cordova 4+ !!!
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         // BLE Adapter
