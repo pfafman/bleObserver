@@ -101,11 +101,11 @@ public class BleObserverPlugin extends CordovaPlugin
   private void startScan(final JSONArray args, final CallbackContext callbackContext)
   {
     LOG.i("BleObserverPlugin:startScan", "call");
-    if (mScanCallbackContext != null) 
-    {
+    if (mScanCallbackContext != null) {
       callbackContext.error("scanning");
       return;
     }
+
     mScanCallbackContext = callbackContext;
 
     // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
@@ -118,11 +118,15 @@ public class BleObserverPlugin extends CordovaPlugin
     //Get the service UUIDs from the arguments
     JSONObject obj = getArgsObject(args);
 
-    UUID[] serviceUUIDs = getServiceUuids(obj);
+    UUID[] serviceUuids = null;
 
+    if (obj != null) {
+      serviceUuids = getServiceUuids(obj);
+    }
+    
     List<ScanFilter> filters = new ArrayList<ScanFilter>();
     
-    if (serviceUUIDs == null || serviceUUIDs.length == 0) {
+    if (serviceUUIDs != null && serviceUUIDs.length > 0) {
       for (UUID serviceUUID : serviceUUIDs) {
         ScanFilter uuidFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUUID)).build();
         filters.add(uuidFilter);
@@ -148,11 +152,11 @@ public class BleObserverPlugin extends CordovaPlugin
   private void stopScan(final CallbackContext callbackContext)
   {
     LOG.i("BleObserverPlugin:stopScan", "called");
-    if (mScanCallbackContext == null) 
-    {
+    if (mScanCallbackContext == null) {
       callbackContext.error("not scanning");
       return;
     }
+    
     mScanCallbackContext = null;
 
     // Run in a thread.  I think the need for this goes away with Cordova 4+ !!!
