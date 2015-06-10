@@ -9,6 +9,7 @@ package com.pfafman.bleObserver;
 // Android Base
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 
 
 // Cordova
