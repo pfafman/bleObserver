@@ -221,6 +221,53 @@ public class BleObserver extends CordovaPlugin
   };
 
 
+  // General Helpers
+  
+  private void addProperty(JSONObject obj, String key, Object value)
+  {
+    //Believe exception only occurs when adding duplicate keys, so just ignore it
+    try
+    {
+      obj.put(key, value);
+    }
+    catch (JSONException e)
+    {
+
+    }
+  }
+
+
+  private void addPropertyBytes(JSONObject obj, String key, byte[] bytes)
+  {
+    String string = Base64.encodeToString(bytes, Base64.NO_WRAP);
+
+    addProperty(obj, key, string);
+  }
+
+
+  private JSONObject getArgsObject(JSONArray args)
+  {
+    if (args.length() == 1)
+    {
+      try
+      {
+        return args.getJSONObject(0);
+      }
+      catch (JSONException ex)
+      {
+      }
+    }
+
+    return null;
+  }
+
+  
+  private void addDevice(JSONObject returnObj, BluetoothDevice device) {
+    addProperty(returnObj, "address", device.getAddress());
+    addProperty(returnObj, "name", device.getName());
+  }
+
+
   private UUID[] parseServiceUUIDList(JSONArray jsonArray) throws JSONException {
     List<UUID> serviceUUIDs = new ArrayList<UUID>();
 
@@ -231,12 +278,5 @@ public class BleObserver extends CordovaPlugin
 
     return serviceUUIDs.toArray(new UUID[jsonArray.length()]);
   }
-
-
-  private void addDevice(JSONObject returnObj, BluetoothDevice device) {
-    addProperty(returnObj, "address", device.getAddress());
-    addProperty(returnObj, "name", device.getName());
-  }
-
 
 }
