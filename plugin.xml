@@ -17,7 +17,7 @@
         <param name="android-package" value="com.pfafman.bleObserver.BleObserverPlugin" />
       </feature>
     </config-file>
-    <source-file src="src/android/BleObserver.java" target-dir="src/com/pfafman/bleobserver" />
+    <source-file src="src/android/BleObserverPlugin.java" target-dir="src/com/pfafman/bleobserver" />
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>
       <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
