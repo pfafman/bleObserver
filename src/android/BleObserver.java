@@ -28,6 +28,7 @@ import org.json.JSONObject;
 // Android BLE
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanSettings;
 import android.bluetooth.le.ScanFilter;
@@ -39,6 +40,7 @@ import android.bluetooth.le.ScanResult;
 //import java.util.*;
 import java.util.UUID;
 import java.util.List;
+import java.util.ArrayList;
 
 
 @TargetApi(21)
@@ -142,7 +144,7 @@ public class BleObserver extends CordovaPlugin
     //   public void run() {
         
     // BLE Adapter
-    BluetoothLeScanner scanner = bluetoothAdapter.getBluetoothLeScanner();
+    BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
     // Stop scan
     scanner.stopScan(scanCallback);
@@ -169,9 +171,9 @@ public class BleObserver extends CordovaPlugin
       
       JSONObject returnObj = new JSONObject();
       addDevice(returnObj, result.getDevice());
-      addProperty(returnObj, keyRssi, result.getRssi());
-      addPropertyBytes(returnObj, keyAdvertisement, result.getScanRecord().getBytes());
-      addProperty(returnObj, keyStatus, statusScanResult);
+      addProperty(returnObj, "rssi", result.getRssi());
+      addPropertyBytes(returnObj, "advertisement", result.getScanRecord().getBytes());
+      addProperty(returnObj, "status", "scanResult");
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
       pluginResult.setKeepCallback(true);
       mScanCallbackContext.sendPluginResult(pluginResult);
@@ -190,9 +192,9 @@ public class BleObserver extends CordovaPlugin
         
         JSONObject returnObj = new JSONObject();
         addDevice(returnObj, result.getDevice());
-        addProperty(returnObj, keyRssi, result.getRssi());
-        addPropertyBytes(returnObj, keyAdvertisement, result.getScanRecord().getBytes());
-        addProperty(returnObj, keyStatus, statusScanResult);
+        addProperty(returnObj, "rssi", result.getRssi());
+        addPropertyBytes(returnObj, "advertisement", result.getScanRecord().getBytes());
+        addProperty(returnObj, "status", "scanResult");
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
         pluginResult.setKeepCallback(true);
         mScanCallbackContext.sendPluginResult(pluginResult);
@@ -210,13 +212,14 @@ public class BleObserver extends CordovaPlugin
       }
 
       JSONObject returnObj = new JSONObject();
-      addProperty(returnObj, keyError, errorStartScan);
-      addProperty(returnObj, keyMessage, logScanStartFail);
+      addProperty(returnObj, "error", "startScan");
+      addProperty(returnObj, "message", "Scan failed to start");
       mScanCallbackContext.error(returnObj);
       mScanCallbackContext = null;
 
     }
   };
+
 
   private UUID[] parseServiceUUIDList(JSONArray jsonArray) throws JSONException {
     List<UUID> serviceUUIDs = new ArrayList<UUID>();
@@ -228,4 +231,12 @@ public class BleObserver extends CordovaPlugin
 
     return serviceUUIDs.toArray(new UUID[jsonArray.length()]);
   }
+
+
+  private void addDevice(JSONObject returnObj, BluetoothDevice device) {
+    addProperty(returnObj, "address", device.getAddress());
+    addProperty(returnObj, "name", device.getName());
+  }
+
+
 }
