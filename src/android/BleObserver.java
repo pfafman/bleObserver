@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 // Android BLE
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanSettings;
 import android.bluetooth.le.ScanFilter;
