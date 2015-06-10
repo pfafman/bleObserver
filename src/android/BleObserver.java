@@ -78,7 +78,7 @@ public class BleObserver extends CordovaPlugin
       startScan(args, callbackContext); 
       return true; 
     
-    } else if ("stopScan".equals(action)) { 
+    } else if ("stop".equals(action)) { 
     
       stopScan(callbackContext); 
       return true; 
@@ -212,7 +212,7 @@ public class BleObserver extends CordovaPlugin
 
     @Override
     public void onScanFailed(final int errorCode) {
-      //Log.e("Scan Failed", "Error Code: " + errorCode);
+      Log.e("Scan Failed", "Error Code: " + errorCode);
       if (mScanCallbackContext == null)
       {
         return;

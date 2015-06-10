@@ -1,5 +1,6 @@
 
 var bleObserverName = "BleObserver";
+                       
 
 var bleObserver = {
   start: function(successCallback, errorCallback, params) {
