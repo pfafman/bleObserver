@@ -139,7 +139,9 @@ public class BleObserverPlugin extends CordovaPlugin
     LOG.i("BleObserverPlugin:startScan", "startScan");
     scanner.startScan(filters, settings, scanCallback);
 
-    callbackContext.success("scanning started");
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "scanning started");
+    pluginResult.setKeepCallback(true);
+    callbackContext.sendPluginResult(pluginResult);
 
     //   }  
     // });
