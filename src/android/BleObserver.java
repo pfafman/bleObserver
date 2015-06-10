@@ -80,7 +80,7 @@ public class BleObserver extends CordovaPlugin
     
     } else if ("stopScan".equals(action)) { 
     
-      stopScan(args, callbackContext); 
+      stopScan(callbackContext); 
       return true; 
     
     } else {
@@ -92,7 +92,7 @@ public class BleObserver extends CordovaPlugin
   }
 
 
-  private void startScan(JSONArray args, CallbackContext callbackContext)
+  private void startScan(final JSONArray args, final CallbackContext callbackContext)
   {
     if (mScanCallbackContext != null) 
     {
@@ -110,8 +110,8 @@ public class BleObserver extends CordovaPlugin
 
     //Get the service UUIDs from the arguments
     JSONObject obj = getArgsObject(args);
-    
-    UUID[] serviceUUIDs = getServiceUuids(args);
+
+    UUID[] serviceUUIDs = getServiceUuids(obj);
 
     List<ScanFilter> filters = new ArrayList<ScanFilter>();
     
