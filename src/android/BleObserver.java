@@ -11,6 +11,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.ParcelUuid;
+import android.util.Base64;
 
 // Cordova
 import org.apache.cordova.CallbackContext;
@@ -91,7 +92,7 @@ public class BleObserver extends CordovaPlugin
   }
 
 
-  private void startScan(final JSONArray args, final CallbackContext callbackContext)
+  private void startScan(JSONArray args, CallbackContext callbackContext)
   {
     if (mScanCallbackContext != null) 
     {
@@ -107,6 +108,9 @@ public class BleObserver extends CordovaPlugin
     // BLE Adapter
     BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
 
+    //Get the service UUIDs from the arguments
+    JSONObject obj = getArgsObject(args);
+    
     UUID[] serviceUUIDs = getServiceUuids(args);
 
     List<ScanFilter> filters = new ArrayList<ScanFilter>();
