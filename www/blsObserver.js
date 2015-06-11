@@ -12,6 +12,15 @@ var bleObserver = {
   flush: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, bleObserverName, "flush", []);
   },
+  enable: function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, bleObserverName, "enable", [params]); 
+  },
+  disable: function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, bleObserverName, "disable", [params]); 
+  },
+  isEnabled:function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, bleObserverName, "isEnabled", [params]); 
+  },
   encodedStringToBytes: function(string) {
     var data = atob(string);
     var bytes = new Uint8Array(data.length);

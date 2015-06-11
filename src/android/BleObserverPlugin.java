@@ -11,6 +11,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Base64;
+import android.content.Intent;
+import android.content.IntentFilter;
+
 
 // Cordova
 import org.apache.cordova.CallbackContext;
@@ -50,8 +53,11 @@ import org.apache.cordova.LOG;
 
 public class BleObserverPlugin extends CordovaPlugin
 {
-  //General callback variables  
+  // General callback variables  
   private CallbackContext mScanCallbackContext;
+  private CallbackContext mInitCallbackContext;
+  
+  // BLE Adapter
   private BluetoothAdapter mBluetoothAdapter;
 
   private final String mBaseUuidStart = "0000";
@@ -91,7 +97,22 @@ public class BleObserverPlugin extends CordovaPlugin
     
       flushPendingScanResults(callbackContext); 
       return true; 
+
+    } else if ("isEnabled".equals(action)) { 
     
+      isEnabled(callbackContext); 
+      return true; 
+
+    } else if ("enable".equals(action)) { 
+    
+      enable(callbackContext); 
+      return true; 
+    
+    } else if ("disable".equals(action)) { 
+    
+      disable(callbackContext); 
+      return true; 
+
     } else {
 
       return false;
@@ -110,45 +131,55 @@ public class BleObserverPlugin extends CordovaPlugin
       return;
     }
 
-    mScanCallbackContext = callbackContext;
+    if (mBluetoothAdapter.isEnabled()) {
 
-    // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
-    // cordova.getThreadPool().execute(new Runnable() {
-    //   public void run() {
+      mScanCallbackContext = callbackContext;
 
-    // BLE Adapter
-    BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+      // Run in a thread. I think the need for this goes away with Cordova 4+ !!!
+      // cordova.getThreadPool().execute(new Runnable() {
+      //   public void run() {
 
-    //Get the service UUIDs from the arguments
-    UUID[] serviceUUIDs = null;
-    JSONObject obj = getArgsObject(args);
-    if (obj != null) {
-      serviceUUIDs = getServiceUuids(obj);
-    }
-    
-    List<ScanFilter> filters = new ArrayList<ScanFilter>();
-    
-    if (serviceUUIDs != null && serviceUUIDs.length > 0) {
-      for (UUID serviceUUID : serviceUUIDs) {
-        ScanFilter uuidFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUUID)).build();
-        filters.add(uuidFilter);
+      // BLE Adapter
+      BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+      //Get the service UUIDs from the arguments
+      UUID[] serviceUUIDs = null;
+      JSONObject obj = getArgsObject(args);
+      if (obj != null) {
+        serviceUUIDs = getServiceUuids(obj);
       }
+      
+      List<ScanFilter> filters = new ArrayList<ScanFilter>();
+      
+      if (serviceUUIDs != null && serviceUUIDs.length > 0) {
+        for (UUID serviceUUID : serviceUUIDs) {
+          ScanFilter uuidFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(serviceUUID)).build();
+          filters.add(uuidFilter);
+        }
+      }
+
+      ScanSettings settings = new ScanSettings.Builder()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        //.setReportDelay(0)
+        .build();
+
+      LOG.i("BleObserverPlugin:startScan", "startScan");
+      scanner.startScan(filters, settings, scanCallback);
+
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "scanning started");
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+
+      //   }  
+      // });
+
+    } else {
+
+       //Request Bluetooth to be enabled
+      Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+      cordova.startActivityForResult(this, enableBtIntent, REQUEST_BT_ENABLE);
+    
     }
-
-    ScanSettings settings = new ScanSettings.Builder()
-      .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-      //.setReportDelay(0)
-      .build();
-
-    LOG.i("BleObserverPlugin:startScan", "startScan");
-    scanner.startScan(filters, settings, scanCallback);
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "scanning started");
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
-
-    //   }  
-    // });
 
   }
 
@@ -203,6 +234,45 @@ public class BleObserverPlugin extends CordovaPlugin
     //pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
 
+  }
+
+  // Ble is Enabled
+  private void isEnabled(final CallbackContext callbackContext)
+  {
+    LOG.i("BleObserverPlugin:isEnabled", "called");
+
+    boolean result = (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled());
+
+    JSONObject returnObj = new JSONObject();
+    addProperty(returnObj, "enabled", result);
+
+    callbackContext.success(returnObj);
+  }
+
+  // Enable BLE
+  private void enable(final CallbackContext callbackContext)
+  {
+    LOG.i("BleObserverPlugin:enable", "called");
+
+    boolean result = (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled());
+
+    JSONObject returnObj = new JSONObject();
+    addProperty(returnObj, "enabled", result);
+
+    callbackContext.success(returnObj);
+  }
+
+  // Disable BLE
+  private void disable(final CallbackContext callbackContext)
+  {
+    LOG.i("BleObserverPlugin:disable", "called");
+
+    boolean result = (mBluetoothAdapter != null && mBluetoothAdapter.isEnabled());
+
+    JSONObject returnObj = new JSONObject();
+    addProperty(returnObj, "enabled", result);
+
+    callbackContext.success(returnObj);
   }
 
 
